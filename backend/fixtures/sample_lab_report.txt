@@ -1,0 +1,20 @@
+Comprehensive Metabolic Panel and Lipid Panel
+
+Glucose 91 mg/dL Reference Range 70-99
+Total Cholesterol 205 mg/dL Reference Range <200
+HDL Cholesterol 52 mg/dL Reference Range >40
+LDL Cholesterol 132 mg/dL Reference Range <100
+Triglycerides 140 mg/dL Reference Range <150
+Vitamin D 24 ng/mL Reference Range 30-100
+WBC 6.1 x10E3/uL Reference Range 3.4-10.8
+RBC 5.0 x10E6/uL Reference Range 4.14-5.80
+Hemoglobin 15.2 g/dL Reference Range 13.0-17.7
+Hematocrit 45 % Reference Range 37.5-51.0
+Platelets 250 x10E3/uL Reference Range 150-450
+Sodium 140 mmol/L Reference Range 134-144
+Potassium 4.3 mmol/L Reference Range 3.5-5.2
+Creatinine 0.91 mg/dL Reference Range 0.76-1.27
+BUN 14 mg/dL Reference Range 6-20
+ALT 22 IU/L Reference Range 0-44
+AST 21 IU/L Reference Range 0-40
+TSH 2.1 uIU/mL Reference Range 0.45-4.5
