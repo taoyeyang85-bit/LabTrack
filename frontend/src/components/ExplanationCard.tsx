@@ -6,7 +6,7 @@ type ExplanationCardProps = {
 
 export default function ExplanationCard({ explanation }: ExplanationCardProps) {
   return (
-    <div className="card explanation-card">
+    <div className="explanation-card">
       <div className="explanation-header">
         <h3>{explanation.biomarker}</h3>
         <span className={`badge badge-${explanation.status}`}>{explanation.status}</span>

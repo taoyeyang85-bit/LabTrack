@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthForm from '../components/AuthForm';
-import DisclaimerBanner from '../components/DisclaimerBanner';
 import LoadingState from '../components/LoadingState';
 import { useAuth } from '../hooks/useAuth';
 
@@ -21,10 +20,8 @@ export default function AuthPage() {
   return (
     <div className="auth-page container">
       <div className="auth-header">
-        <h1>{mode === 'login' ? 'Welcome back' : 'Create your account'}</h1>
-        <p className="text-muted">
-          Sign in to upload lab reports and track your health trends.
-        </p>
+        <h1>{mode === 'login' ? 'Sign in' : 'Create account'}</h1>
+        <p className="text-muted">Track your lab results securely.</p>
       </div>
 
       <div className="auth-tabs">
@@ -55,8 +52,6 @@ export default function AuthPage() {
           navigate('/dashboard');
         }}
       />
-
-      <DisclaimerBanner />
     </div>
   );
 }

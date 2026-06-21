@@ -26,7 +26,6 @@ export default function AuthForm({ mode, onSubmit }: AuthFormProps) {
 
   return (
     <form className="auth-form card" onSubmit={handleSubmit}>
-      <h2>{mode === 'login' ? 'Sign in' : 'Create account'}</h2>
       {error && <div className="alert alert-error">{error}</div>}
       <label>
         Email
@@ -50,7 +49,7 @@ export default function AuthForm({ mode, onSubmit }: AuthFormProps) {
         />
       </label>
       <button type="submit" className="btn btn-primary" disabled={loading}>
-        {loading ? 'Please wait…' : mode === 'login' ? 'Sign in' : 'Sign up'}
+        {loading ? 'Please wait…' : mode === 'login' ? 'Sign in' : 'Create account'}
       </button>
     </form>
   );

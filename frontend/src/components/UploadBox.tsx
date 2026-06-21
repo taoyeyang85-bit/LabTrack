@@ -77,14 +77,11 @@ export default function UploadBox({ onUpload }: UploadBoxProps) {
           disabled={loading}
         />
         {loading ? (
-          <p>Parsing your lab report… This may take a moment.</p>
+          <p className="upload-status">Reading your report… this may take a minute on free hosting.</p>
         ) : (
           <>
-            <p className="upload-title">Drop your lab report here</p>
-            <p className="upload-subtitle">PDF, PNG, JPG, or JPEG — max 10 MB</p>
-            <button type="button" className="btn btn-primary">
-              Choose file
-            </button>
+            <p className="upload-title">Drop file here or tap to choose</p>
+            <p className="upload-subtitle">PDF, PNG, JPG · max 10 MB</p>
           </>
         )}
       </div>

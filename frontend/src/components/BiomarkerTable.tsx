@@ -21,8 +21,8 @@ function StatusBadge({ status }: { status: Biomarker['status'] }) {
 export default function BiomarkerTable({ biomarkers }: BiomarkerTableProps) {
   if (biomarkers.length === 0) {
     return (
-      <div className="card">
-        <p>No biomarkers were extracted from this report.</p>
+      <div className="card empty-state compact">
+        <p>No values were found in this report.</p>
       </div>
     );
   }
@@ -32,25 +32,27 @@ export default function BiomarkerTable({ biomarkers }: BiomarkerTableProps) {
       <table className="biomarker-table">
         <thead>
           <tr>
-            <th>Biomarker</th>
+            <th>Test</th>
             <th>Value</th>
-            <th>Unit</th>
-            <th>Reference Range</th>
+            <th>Range</th>
             <th>Status</th>
-            <th>Needs Review</th>
           </tr>
         </thead>
         <tbody>
           {biomarkers.map((b) => (
             <tr key={b.canonical_name}>
-              <td>{b.display_name}</td>
-              <td>{b.value ?? b.raw_value}</td>
-              <td>{b.unit ?? '—'}</td>
+              <td>
+                {b.display_name}
+                {b.needs_review && <span className="review-dot" title="Needs review" />}
+              </td>
+              <td>
+                {b.value ?? b.raw_value}
+                {b.unit ? ` ${b.unit}` : ''}
+              </td>
               <td>{formatRange(b)}</td>
               <td>
                 <StatusBadge status={b.status} />
               </td>
-              <td>{b.needs_review ? 'Yes' : 'No'}</td>
             </tr>
           ))}
         </tbody>

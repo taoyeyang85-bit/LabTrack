@@ -1,59 +1,49 @@
 import { Link } from 'react-router-dom';
-import DisclaimerBanner from '../components/DisclaimerBanner';
+import { useAuth } from '../hooks/useAuth';
 
 export default function LandingPage() {
+  const { user } = useAuth();
+
   return (
     <div className="landing-page">
       <section className="hero">
         <h1>LabTrack</h1>
-        <p className="tagline">Understand your lab reports. Track your health trends.</p>
-        <p className="hero-description">
-          Upload blood test PDFs or screenshots. LabTrack extracts common lab values, explains
-          them in simple language, and helps you track changes over time — for education and
-          personal organization, not diagnosis.
-        </p>
+        <p className="tagline">Understand your lab reports. Track trends over time.</p>
         <div className="hero-actions">
-          <Link to="/auth" className="btn btn-primary">
-            Get started
-          </Link>
-          <Link to="/auth" className="btn btn-secondary">
-            Sign in
+          <Link to={user ? '/dashboard' : '/auth'} className="btn btn-primary">
+            {user ? 'Go to dashboard' : 'Get started'}
           </Link>
         </div>
       </section>
 
-      <section className="features container">
-        <div className="feature-card card">
-          <h3>Upload & parse</h3>
-          <p>
-            Upload PDFs or photos of lab reports. We extract glucose, cholesterol, vitamins,
-            CBC values, and more.
-          </p>
+      <section className="steps container">
+        <div className="step">
+          <span className="step-num">1</span>
+          <div>
+            <h3>Upload</h3>
+            <p>Add a PDF or photo of your blood test results.</p>
+          </div>
         </div>
-        <div className="feature-card card">
-          <h3>Plain-language explanations</h3>
-          <p>
-            Each value is explained based on the reference range on your report, with reminders
-            to discuss results with your clinician.
-          </p>
+        <div className="step">
+          <span className="step-num">2</span>
+          <div>
+            <h3>Understand</h3>
+            <p>See your values explained in plain language.</p>
+          </div>
         </div>
-        <div className="feature-card card">
-          <h3>Track trends</h3>
-          <p>
-            Compare results across reports and see how biomarkers change over time with simple
-            charts.
-          </p>
-        </div>
-        <div className="feature-card card">
-          <h3>Questions for your doctor</h3>
-          <p>
-            Get suggested questions to bring to your next appointment based on your extracted
-            values.
-          </p>
+        <div className="step">
+          <span className="step-num">3</span>
+          <div>
+            <h3>Track</h3>
+            <p>Compare results across reports on your dashboard.</p>
+          </div>
         </div>
       </section>
 
-      <DisclaimerBanner />
+      <p className="landing-disclaimer container">
+        For education and personal records only — not medical advice. Always consult a
+        licensed clinician about your health.
+      </p>
     </div>
   );
 }

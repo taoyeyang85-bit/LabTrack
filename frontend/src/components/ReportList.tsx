@@ -13,10 +13,10 @@ function formatDate(report: Report): string {
 export default function ReportList({ reports }: ReportListProps) {
   if (reports.length === 0) {
     return (
-      <div className="card empty-state">
-        <p>No reports yet. Upload your first lab report to get started.</p>
-        <Link to="/upload" className="btn btn-primary">
-          Upload report
+      <div className="card empty-state compact">
+        <p>No reports yet.</p>
+        <Link to="/upload" className="btn btn-primary btn-sm">
+          Upload your first report
         </Link>
       </div>
     );
@@ -25,18 +25,14 @@ export default function ReportList({ reports }: ReportListProps) {
   return (
     <div className="report-list">
       {reports.map((report) => (
-        <Link key={report.id} to={`/reports/${report.id}`} className="card report-card">
-          <div className="report-card-header">
+        <Link key={report.id} to={`/reports/${report.id}`} className="report-row">
+          <div>
             <strong>{report.original_filename}</strong>
-            <span className="text-muted">{formatDate(report)}</span>
-          </div>
-          <div className="report-card-meta">
-            <span>{report.biomarkers.length} biomarkers</span>
-            <span>
-              {report.biomarkers.filter((b) => b.needs_review).length} need review
+            <span className="text-muted">
+              {report.biomarkers.length} values
             </span>
-            <span className="badge badge-neutral">{report.extraction_method}</span>
           </div>
+          <span className="report-date">{formatDate(report)}</span>
         </Link>
       ))}
     </div>

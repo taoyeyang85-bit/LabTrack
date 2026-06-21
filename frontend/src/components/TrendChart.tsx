@@ -24,29 +24,27 @@ export default function TrendChart({ canonicalName, data }: TrendChartProps) {
   const chartData = data.map((d) => ({
     date: d.report_date,
     value: d.value,
-    unit: d.unit,
   }));
 
   return (
     <div className="card trend-chart">
-      <h3>{title} trend</h3>
-      <p className="text-muted chart-unit">{unit && `Unit: ${unit}`}</p>
-      <ResponsiveContainer width="100%" height={240}>
-        <LineChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 8 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e8ecef" />
-          <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-          <YAxis tick={{ fontSize: 12 }} domain={['auto', 'auto']} />
+      <h3>{title}</h3>
+      <ResponsiveContainer width="100%" height={200}>
+        <LineChart data={chartData} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#eceff3" vertical={false} />
+          <XAxis dataKey="date" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
+          <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} width={40} />
           <Tooltip
-            formatter={(value: number) => [`${value} ${unit}`.trim(), title]}
-            labelFormatter={(label) => `Date: ${label}`}
+            formatter={(value: number) => [`${value}${unit ? ` ${unit}` : ''}`, title]}
+            labelFormatter={(label) => String(label)}
           />
           <Line
             type="monotone"
             dataKey="value"
-            stroke="#2d6a9f"
+            stroke="#2563eb"
             strokeWidth={2}
-            dot={{ r: 4, fill: '#2d6a9f' }}
-            activeDot={{ r: 6 }}
+            dot={{ r: 3, fill: '#2563eb' }}
+            activeDot={{ r: 5 }}
           />
         </LineChart>
       </ResponsiveContainer>
