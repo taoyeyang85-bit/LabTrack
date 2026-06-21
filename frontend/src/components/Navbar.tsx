@@ -22,9 +22,6 @@ export default function Navbar() {
         <div className="navbar-links">
           {user ? (
             <>
-              <Link to="/dashboard" className={isActive('/dashboard') ? 'active' : ''}>
-                Dashboard
-              </Link>
               <Link to="/upload" className={isActive('/upload') ? 'active' : ''}>
                 Upload
               </Link>

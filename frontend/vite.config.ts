@@ -8,4 +8,7 @@ const base = process.env.VITE_BASE_PATH || '/';
 export default defineConfig({
   plugins: [react()],
   base,
+  server: {
+    allowedHosts: ['host.docker.internal'],
+  },
 });

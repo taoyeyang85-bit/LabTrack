@@ -16,11 +16,6 @@ export default function DashboardPage() {
     exitSample,
   } = useDashboard();
 
-  const latest = reports[0];
-  const latestDate = latest
-    ? latest.report_date || new Date(latest.uploaded_at).toLocaleDateString()
-    : '—';
-
   const trendCharts = TREND_BIOMARKERS.filter(
     (name) => trends[name] && trends[name].length >= 2
   );
@@ -29,11 +24,15 @@ export default function DashboardPage() {
     <div className="dashboard-page container">
       <div className="page-header">
         <div>
-          <h1>Dashboard</h1>
-          <p className="text-muted">Your lab results at a glance</p>
+          <h1>Your reports</h1>
+          <p className="text-muted">
+            {reports.length === 0
+              ? 'Upload your first report to get started.'
+              : `${reports.length} ${reports.length === 1 ? 'report' : 'reports'} saved`}
+          </p>
         </div>
         <Link to="/upload" className="btn btn-primary">
-          Upload
+          + Upload
         </Link>
       </div>
 
@@ -67,61 +66,25 @@ export default function DashboardPage() {
         <div className="loading-inline">Loading…</div>
       ) : (
         <>
-          <div className="stats-row">
-            <div className="stat">
-              <span className="stat-value">{reports.length}</span>
-              <span className="stat-label">Reports</span>
-            </div>
-            <div className="stat">
-              <span className="stat-value stat-value-sm">{latestDate}</span>
-              <span className="stat-label">Latest</span>
-            </div>
-            <div className="stat">
-              <span className="stat-value">{trendCharts.length}</span>
-              <span className="stat-label">Trends</span>
-            </div>
-          </div>
-
-          {latest && (
+          {trendCharts.length > 0 && (
             <section className="section">
-              <div className="section-header">
-                <h2>Latest report</h2>
-                <Link to={`/reports/${latest.id}`} className="text-link">
-                  View all details →
-                </Link>
+              <h2>Trends</h2>
+              <div className="trends-grid">
+                {trendCharts.slice(0, 2).map((name) => (
+                  <TrendChart key={name} canonicalName={name} data={trends[name]} />
+                ))}
               </div>
-              <Link to={`/reports/${latest.id}`} className="card report-highlight">
-                <strong>{latest.original_filename}</strong>
-                <span className="text-muted">
-                  {latest.biomarkers.length} values · {latestDate}
-                </span>
-              </Link>
             </section>
           )}
 
           <section className="section">
-            <h2>Trends</h2>
-            {trendCharts.length > 0 ? (
-              <div className="trends-grid">
-                {trendCharts.map((name) => (
-                  <TrendChart key={name} canonicalName={name} data={trends[name]} />
-                ))}
-              </div>
-            ) : (
-              <div className="card empty-state compact">
-                <p>Upload two or more reports to see trend charts.</p>
-                {!usingSample && reports.length === 0 && (
-                  <button type="button" className="btn btn-secondary btn-sm" onClick={loadSample}>
-                    Preview with sample data
-                  </button>
-                )}
-              </div>
-            )}
-          </section>
-
-          <section className="section">
-            <h2>All reports</h2>
+            {reports.length > 0 && <h2>Recent</h2>}
             <ReportList reports={reports} />
+            {!usingSample && reports.length === 0 && (
+              <button type="button" className="sample-link" onClick={loadSample}>
+                Preview sample data
+              </button>
+            )}
           </section>
         </>
       )}

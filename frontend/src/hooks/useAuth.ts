@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
 import {
+  GoogleAuthProvider,
   User,
-  createUserWithEmailAndPassword,
   onAuthStateChanged,
-  signInWithEmailAndPassword,
+  signInWithPopup,
   signOut,
 } from 'firebase/auth';
 import { auth } from '../lib/firebase';
+
+const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: 'select_account' });
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -20,13 +23,9 @@ export function useAuth() {
     return unsubscribe;
   }, []);
 
-  const login = (email: string, password: string) =>
-    signInWithEmailAndPassword(auth, email, password);
-
-  const signup = (email: string, password: string) =>
-    createUserWithEmailAndPassword(auth, email, password);
+  const signInWithGoogle = () => signInWithPopup(auth, googleProvider);
 
   const logout = () => signOut(auth);
 
-  return { user, loading, login, signup, logout };
+  return { user, loading, signInWithGoogle, logout };
 }
