@@ -1,0 +1,19 @@
+# Blueprint for Render free-tier backend ($0/month).
+# Connect repo at https://dashboard.render.com → New → Blueprint
+services:
+  - type: web
+    name: labtrack-api
+    runtime: docker
+    dockerfilePath: backend/Dockerfile
+    dockerContext: backend
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: FIREBASE_CLIENT_EMAIL
+        sync: false
+      - key: FIREBASE_PRIVATE_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false

@@ -80,6 +80,11 @@ def generate_explanations(
 
     try:
         return _llm_explanations(biomarkers, trend_messages, extraction_warnings, settings)
+    except ImportError:
+        result = _fallback_explanations(biomarkers, trend_messages, extraction_warnings)
+        explanations, questions, warnings = result
+        warnings.insert(0, "OpenAI package not installed; rule-based explanations were used instead.")
+        return explanations, questions, warnings
     except Exception:
         result = _fallback_explanations(biomarkers, trend_messages, extraction_warnings)
         explanations, questions, warnings = result

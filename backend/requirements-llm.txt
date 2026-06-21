@@ -1,0 +1,3 @@
+# Optional paid LLM explanations. Not needed for the free tier.
+-r requirements.txt
+openai>=1.54.0

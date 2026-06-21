@@ -6,6 +6,8 @@ LabTrack is a patient-facing lab report explainer and health trend dashboard. Us
 
 > **Disclaimer:** LabTrack is for education and personal record organization only. It does not provide medical advice, diagnosis, or treatment. Always consult a licensed clinician about your health decisions.
 
+> **Running for $0:** See [FREE_TIER.md](./FREE_TIER.md) for the full free stack (no OpenAI, Firebase Spark, GitHub Pages, Render/Railway free).
+
 ## Tech Stack
 
 | Layer | Technology |
@@ -13,12 +15,12 @@ LabTrack is a patient-facing lab report explainer and health trend dashboard. Us
 | Frontend | React, Vite, TypeScript, Recharts |
 | Frontend hosting | GitHub Pages |
 | Backend | FastAPI, Python |
-| Backend hosting | Railway |
-| Authentication | Firebase Authentication |
-| Database | Firebase Firestore |
+| Backend hosting | Render (free) or Railway (free tier) |
+| Authentication | Firebase Authentication (Spark plan) |
+| Database | Firebase Firestore (Spark plan) |
 | PDF parsing | PyMuPDF, pdfplumber |
 | OCR | pytesseract |
-| LLM explanations | OpenAI (backend-only, with rule-based fallback) |
+| LLM explanations | Rule-based (default, free). OpenAI optional — see `requirements-llm.txt` |
 
 ## Architecture
 
@@ -99,7 +101,7 @@ npm install
 FIREBASE_PROJECT_ID=your-project-id
 FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@your-project-id.iam.gserviceaccount.com
 FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
-OPENAI_API_KEY=sk-...          # optional; fallback mode works without it
+OPENAI_API_KEY=          # leave empty for free tier (rule-based explanations)
 LLM_MODEL=gpt-4o-mini
 CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
 PORT=8000
@@ -143,33 +145,47 @@ cd backend
 pytest tests/ -v
 ```
 
-## Railway Deployment
+## Railway Deployment (free tier)
+
+> Railway Free is **$0/month** with ~**$1 usage credit/month**. Heavy OCR workloads may exceed that if run 24/7. See [FREE_TIER.md](./FREE_TIER.md) — **Render free** is the more reliable $0 option.
 
 1. Create a new project on [Railway](https://railway.app/).
-2. Connect your GitHub repo and set the root directory to `backend/`.
-3. Railway will detect the `Dockerfile`.
-4. Add environment variables:
+2. After the $5 trial, **downgrade to the Free plan** (Settings → Billing). Do not upgrade to Hobby unless you want to pay $5/mo.
+3. Connect your GitHub repo and set the root directory to `backend/`.
+4. Add environment variables (leave `OPENAI_API_KEY` empty for free tier):
 
    | Variable | Value |
    |----------|-------|
    | `FIREBASE_PROJECT_ID` | Your Firebase project ID |
    | `FIREBASE_CLIENT_EMAIL` | Service account email |
    | `FIREBASE_PRIVATE_KEY` | Private key (with `\n` for newlines) |
-   | `OPENAI_API_KEY` | Optional OpenAI key |
+   | `OPENAI_API_KEY` | *(leave empty)* |
    | `LLM_MODEL` | `gpt-4o-mini` |
-   | `CORS_ORIGINS` | `https://yourusername.github.io,http://localhost:5173` |
+   | `CORS_ORIGINS` | `https://taoyeyang85-bit.github.io,http://localhost:5173` |
    | `PORT` | Railway sets this automatically |
 
 5. Deploy. Note the public URL (e.g. `https://labtrack-api.up.railway.app`).
 6. Health check: `GET /health` → `{"status":"ok"}`
 
+## Render Deployment (free — recommended for $0)
+
+1. Go to [Render](https://render.com/) → **New** → **Blueprint** → connect this repo.
+2. Render reads `render.yaml` and creates a free web service from `backend/Dockerfile`.
+3. Set the same env vars as Railway (no `OPENAI_API_KEY`).
+4. Free instances **sleep after 15 min idle**; first request may take up to ~60s to wake up.
+5. Copy the Render URL into the `VITE_API_BASE_URL` GitHub secret.
+
 ## GitHub Pages Deployment
+
+> **First-time setup:** See [SETUP.md](./SETUP.md) for Firebase, GitHub Pages, and Railway configuration.
 
 ### Option A: GitHub Actions (recommended)
 
-1. Enable GitHub Pages: repo Settings → Pages → Source: **GitHub Actions**.
+1. Enable GitHub Pages: repo [Settings → Pages](https://github.com/taoyeyang85-bit/LabTrack/settings/pages) → Source: **GitHub Actions**.
+   - A `404 Not Found` on `deploy-pages` means this step was skipped.
 2. Add repository secrets for all `VITE_*` env vars plus `VITE_API_BASE_URL` pointing to your Railway backend.
 3. Push to `main`. The workflow in `.github/workflows/deploy-frontend.yml` builds and deploys automatically.
+4. Live URL: `https://taoyeyang85-bit.github.io/LabTrack/`
 
 ### Option B: Manual deploy
 
