@@ -6,7 +6,7 @@ import { useReport } from '../hooks/useReports';
 
 export default function ReportDetailPage() {
   const { reportId } = useParams<{ reportId: string }>();
-  const { report, loading, error, usingSample } = useReport(reportId);
+  const { report, loading, error } = useReport(reportId);
 
   if (loading) return <LoadingState message="Loading report…" />;
   if (error) {
@@ -48,12 +48,6 @@ export default function ReportDetailPage() {
           <p className="text-muted">{displayDate}</p>
         </div>
       </div>
-
-      {usingSample && (
-        <div className="banner banner-info">
-          Sample report for preview purposes only.
-        </div>
-      )}
 
       {report.warnings.length > 0 && (
         <div className="banner banner-warn compact">

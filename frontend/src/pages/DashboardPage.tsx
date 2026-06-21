@@ -5,16 +5,7 @@ import { useDashboard } from '../hooks/useReports';
 import { TREND_BIOMARKERS } from '../types';
 
 export default function DashboardPage() {
-  const {
-    reports,
-    trends,
-    loading,
-    apiError,
-    usingSample,
-    reload,
-    loadSample,
-    exitSample,
-  } = useDashboard();
+  const { reports, trends, loading, apiError, reload } = useDashboard();
 
   const trendCharts = TREND_BIOMARKERS.filter(
     (name) => trends[name] && trends[name].length >= 2
@@ -36,16 +27,7 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      {usingSample && (
-        <div className="banner banner-info">
-          <span>Viewing sample data to preview the dashboard.</span>
-          <button type="button" className="btn btn-ghost btn-sm" onClick={() => void exitSample()}>
-            Use my data
-          </button>
-        </div>
-      )}
-
-      {apiError && !usingSample && (
+      {apiError && (
         <div className="banner banner-warn">
           <div>
             <strong>Could not load your reports</strong>
@@ -54,9 +36,6 @@ export default function DashboardPage() {
           <div className="banner-actions">
             <button type="button" className="btn btn-secondary btn-sm" onClick={() => void reload()}>
               Retry
-            </button>
-            <button type="button" className="btn btn-primary btn-sm" onClick={loadSample}>
-              Preview sample
             </button>
           </div>
         </div>
@@ -80,11 +59,6 @@ export default function DashboardPage() {
           <section className="section">
             {reports.length > 0 && <h2>Recent</h2>}
             <ReportList reports={reports} />
-            {!usingSample && reports.length === 0 && (
-              <button type="button" className="sample-link" onClick={loadSample}>
-                Preview sample data
-              </button>
-            )}
           </section>
         </>
       )}

@@ -139,12 +139,6 @@ chmod +x scripts/set-github-secrets.sh
 
 See [FREE_TIER.md](./FREE_TIER.md) for cost limits and trade-offs.
 
-### Dashboard without a backend (demo mode)
-
-GitHub Pages deploys default to **demo mode** so the dashboard works immediately with sample reports and trend charts. Sign in with Firebase, open **Dashboard**, and explore.
-
-When your backend is live, add GitHub secret `VITE_DEMO_MODE` = `false` and re-deploy.
-
 ## Checklist
 
 - [ ] Firebase Email/Password auth enabled

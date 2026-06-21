@@ -1,11 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ApiError, fetchReport, fetchReports } from '../lib/api';
-import {
-  DEMO_REPORTS,
-  computeTrendsFromReports,
-  findDemoReport,
-  isDemoModeEnabled,
-} from '../lib/demoData';
+import { computeTrendsFromReports } from '../lib/trends';
 import type { Report, TrendsResponse } from '../types';
 
 export type DashboardState = {
@@ -13,26 +8,15 @@ export type DashboardState = {
   trends: TrendsResponse['trends'];
   loading: boolean;
   apiError: string | null;
-  usingSample: boolean;
   reload: () => Promise<void>;
-  loadSample: () => void;
-  exitSample: () => Promise<void>;
 };
 
 export function useDashboard(): DashboardState {
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState<string | null>(null);
-  const [usingSample, setUsingSample] = useState(isDemoModeEnabled());
 
-  const loadReports = useCallback(async (sampleMode: boolean) => {
-    if (sampleMode) {
-      setReports(DEMO_REPORTS);
-      setApiError(null);
-      setLoading(false);
-      return;
-    }
-
+  const loadReports = useCallback(async () => {
     setLoading(true);
     setApiError(null);
     try {
@@ -53,22 +37,13 @@ export function useDashboard(): DashboardState {
   }, []);
 
   useEffect(() => {
-    void loadReports(usingSample);
-  }, [loadReports, usingSample]);
+    void loadReports();
+  }, [loadReports]);
 
   const trends = useMemo(() => computeTrendsFromReports(reports), [reports]);
 
   const reload = useCallback(async () => {
-    await loadReports(usingSample);
-  }, [loadReports, usingSample]);
-
-  const loadSample = useCallback(() => {
-    setUsingSample(true);
-  }, []);
-
-  const exitSample = useCallback(async () => {
-    setUsingSample(false);
-    await loadReports(false);
+    await loadReports();
   }, [loadReports]);
 
   return {
@@ -76,10 +51,7 @@ export function useDashboard(): DashboardState {
     trends,
     loading,
     apiError,
-    usingSample,
     reload,
-    loadSample,
-    exitSample,
   };
 }
 
@@ -87,33 +59,16 @@ export function useReport(reportId: string | undefined) {
   const [report, setReport] = useState<Report | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [usingSample, setUsingSample] = useState(false);
 
   useEffect(() => {
     if (!reportId) return;
 
-    const demoReport = findDemoReport(reportId);
-    if (isDemoModeEnabled() && demoReport) {
-      setReport(demoReport);
-      setUsingSample(true);
-      setError(null);
-      setLoading(false);
-      return;
-    }
-
     setLoading(true);
     setError(null);
-    setUsingSample(false);
 
     fetchReport(reportId)
       .then(setReport)
       .catch((err) => {
-        if (demoReport) {
-          setReport(demoReport);
-          setUsingSample(true);
-          setError(null);
-          return;
-        }
         setError(
           err instanceof ApiError
             ? err.message
@@ -125,5 +80,5 @@ export function useReport(reportId: string | undefined) {
       .finally(() => setLoading(false));
   }, [reportId]);
 
-  return { report, loading, error, usingSample };
+  return { report, loading, error };
 }

@@ -615,22 +615,6 @@ a:hover {
   color: var(--muted);
 }
 
-.sample-link {
-  display: block;
-  margin: 1rem auto 0;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--muted);
-  font: inherit;
-  font-size: 0.82rem;
-  cursor: pointer;
-}
-
-.sample-link:hover {
-  color: var(--primary);
-}
-
 /* Upload */
 .upload-dropzone {
   border: 1.5px dashed var(--border);
