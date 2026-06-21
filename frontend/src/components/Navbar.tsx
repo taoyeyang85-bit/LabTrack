@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import ThemeToggle from './ThemeToggle';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -20,6 +21,7 @@ export default function Navbar() {
           LabTrack
         </Link>
         <div className="navbar-links">
+          <ThemeToggle />
           {user ? (
             <>
               <Link to="/upload" className={isActive('/upload') ? 'active' : ''}>
