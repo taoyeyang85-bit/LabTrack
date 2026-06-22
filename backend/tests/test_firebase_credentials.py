@@ -3,6 +3,7 @@ import json
 
 from app.firebase_credentials import (
     build_service_account_info,
+    diagnose_credential_issues,
     normalize_private_key,
 )
 

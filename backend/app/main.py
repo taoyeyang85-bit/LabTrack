@@ -72,6 +72,12 @@ def firebase_health_check():
     return {
         "status": "ok" if status["configured"] else "misconfigured",
         **status,
+        "fix": (
+            "Set FIREBASE_SERVICE_ACCOUNT_BASE64 from scripts/railway-set-firebase.sh "
+            "and remove FIREBASE_CLIENT_EMAIL / FIREBASE_PRIVATE_KEY / FIREBASE_SERVICE_ACCOUNT_JSON."
+            if not status["configured"]
+            else None
+        ),
     }
 
 

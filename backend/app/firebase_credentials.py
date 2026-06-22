@@ -133,6 +133,62 @@ def load_service_account_info() -> dict[str, Any] | None:
     )
 
 
+def _json_load_error(blob: str) -> str | None:
+    text = blob.strip()
+    if not text:
+        return "empty"
+    if (text.startswith('"') and text.endswith('"')) or (text.startswith("'") and text.endswith("'")):
+        text = text[1:-1].strip()
+    try:
+        json.loads(text)
+        return None
+    except json.JSONDecodeError as exc:
+        return str(exc)
+
+
+def diagnose_credential_issues() -> list[str]:
+    issues: list[str] = []
+    project_id = os.getenv("FIREBASE_PROJECT_ID", "").strip()
+    client_email = os.getenv("FIREBASE_CLIENT_EMAIL", "").strip()
+    private_key = os.getenv("FIREBASE_PRIVATE_KEY", "").strip()
+    service_account_json = os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON", "").strip()
+    service_account_base64 = os.getenv("FIREBASE_SERVICE_ACCOUNT_BASE64", "").strip()
+
+    if service_account_base64:
+        if _service_account_from_base64(service_account_base64) is None:
+            issues.append("FIREBASE_SERVICE_ACCOUNT_BASE64 is set but invalid.")
+    elif service_account_json:
+        json_error = _json_load_error(service_account_json)
+        if json_error:
+            issues.append(f"FIREBASE_SERVICE_ACCOUNT_JSON is not valid JSON ({json_error}).")
+        elif _service_account_from_json_blob(service_account_json) is None:
+            issues.append("FIREBASE_SERVICE_ACCOUNT_JSON is missing service_account fields or private key.")
+    else:
+        if not project_id:
+            issues.append("FIREBASE_PROJECT_ID is missing.")
+        if not client_email:
+            issues.append("FIREBASE_CLIENT_EMAIL is missing.")
+        elif not client_email.endswith(".iam.gserviceaccount.com"):
+            issues.append(
+                "FIREBASE_CLIENT_EMAIL must be the Firebase service-account email "
+                "(ends with .iam.gserviceaccount.com), not a personal Gmail address."
+            )
+        if not private_key:
+            issues.append("FIREBASE_PRIVATE_KEY is missing.")
+        elif "BEGIN PRIVATE KEY" not in normalize_private_key(private_key):
+            issues.append("FIREBASE_PRIVATE_KEY is not a valid PEM private key.")
+
+    if (
+        service_account_json
+        and service_account_base64
+        and _service_account_from_base64(service_account_base64) is None
+        and _service_account_from_json_blob(service_account_json) is None
+    ):
+        issues.append("Remove broken FIREBASE_SERVICE_ACCOUNT_JSON / FIREBASE_PRIVATE_KEY and use only FIREBASE_SERVICE_ACCOUNT_BASE64.")
+
+    return issues
+
+
 def get_credential_status() -> dict[str, Any]:
     project_id = os.getenv("FIREBASE_PROJECT_ID", "").strip()
     client_email = os.getenv("FIREBASE_CLIENT_EMAIL", "").strip()
@@ -140,11 +196,13 @@ def get_credential_status() -> dict[str, Any]:
     service_account_json = os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON", "").strip()
     service_account_base64 = os.getenv("FIREBASE_SERVICE_ACCOUNT_BASE64", "").strip()
     loaded = load_service_account_info()
+    issues = diagnose_credential_issues()
 
     return {
         "configured": loaded is not None,
         "project_id": loaded.get("project_id") if loaded else project_id or None,
         "client_email": loaded.get("client_email") if loaded else client_email or None,
+        "issues": issues,
         "sources": {
             "service_account_base64": bool(service_account_base64),
             "service_account_json": bool(service_account_json),
