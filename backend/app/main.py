@@ -64,6 +64,17 @@ def health_check():
     return {"status": "ok"}
 
 
+@app.get("/health/firebase")
+def firebase_health_check():
+    from app.firebase_credentials import get_credential_status
+
+    status = get_credential_status()
+    return {
+        "status": "ok" if status["configured"] else "misconfigured",
+        **status,
+    }
+
+
 @app.post("/api/reports/upload", response_model=Report)
 async def upload_report(
     file: UploadFile = File(...),

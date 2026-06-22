@@ -10,11 +10,16 @@ if [[ $# -ne 1 ]]; then
 fi
 
 python3 - "$1" <<'PY'
+import base64
 import json
 import sys
 from pathlib import Path
 
 path = Path(sys.argv[1])
 data = json.loads(path.read_text())
-print(json.dumps(data, separators=(",", ":")))
+compact = json.dumps(data, separators=(",", ":"))
+print(compact)
+print()
+print("Base64 for Railway variable FIREBASE_SERVICE_ACCOUNT_BASE64:")
+print(base64.b64encode(compact.encode()).decode())
 PY

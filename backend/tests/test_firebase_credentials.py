@@ -1,3 +1,6 @@
+import base64
+import json
+
 from app.firebase_credentials import (
     build_service_account_info,
     normalize_private_key,
@@ -46,3 +49,25 @@ def test_build_service_account_info_from_json_blob():
     assert info is not None
     assert info["project_id"] == "labtrack-f1e40"
     assert info["private_key"].startswith("-----BEGIN PRIVATE KEY-----\n")
+
+
+def test_build_service_account_info_from_base64_blob():
+    escaped_key = SAMPLE_KEY.replace("\n", "\\n")
+    blob = json.dumps(
+        {
+            "type": "service_account",
+            "project_id": "labtrack-f1e40",
+            "client_email": "firebase-adminsdk@test.iam.gserviceaccount.com",
+            "private_key": escaped_key,
+        },
+        separators=(",", ":"),
+    )
+    encoded = base64.b64encode(blob.encode()).decode()
+    info = build_service_account_info(
+        project_id="",
+        client_email="",
+        private_key="",
+        service_account_base64=encoded,
+    )
+    assert info is not None
+    assert info["project_id"] == "labtrack-f1e40"

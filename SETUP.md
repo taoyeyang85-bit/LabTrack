@@ -141,8 +141,19 @@ chmod +x scripts/set-github-secrets.sh
    Generate the one-line JSON from a downloaded key:
 
    ```bash
-   ./scripts/import-service-account.sh ~/Downloads/labtrack-f1e40-firebase-adminsdk-xxxxx.json
-   python3 -c 'import json, pathlib; print(json.dumps(json.loads(pathlib.Path("~/Downloads/key.json").expanduser().read_text())))'
+   ./scripts/print-service-account-json.sh ~/Downloads/labtrack-f1e40-firebase-adminsdk-xxxxx.json
+   ```
+
+   Or push credentials directly to Railway (after `npx @railway/cli login`):
+
+   ```bash
+   ./scripts/railway-set-firebase.sh ~/Downloads/labtrack-f1e40-firebase-adminsdk-xxxxx.json
+   ```
+
+   Then verify:
+
+   ```bash
+   curl https://labtrack-production-21c6.up.railway.app/health/firebase
    ```
 
 4. Copy the public Railway URL (for example `https://labtrack-production-21c6.up.railway.app`)
