@@ -33,6 +33,22 @@ jobs:
         working-directory: frontend
         run: npm ci
 
+      - name: Resolve API base URL
+        id: api
+        run: |
+          API_URL="${{ secrets.VITE_API_BASE_URL }}"
+          if [ -z "$API_URL" ]; then
+            API_URL="https://labtrack-api.onrender.com"
+          fi
+          echo "url=$API_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Write runtime config
+        working-directory: frontend
+        run: |
+          cat > public/config.json <<EOF
+          {"apiBaseUrl":"${{ steps.api.outputs.url }}"}
+          EOF
+
       - name: Build
         working-directory: frontend
         env:
@@ -45,7 +61,7 @@ jobs:
           VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
           VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
-          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+          VITE_API_BASE_URL: ${{ steps.api.outputs.url }}
         run: npm run build
 
       - uses: actions/upload-pages-artifact@v3

@@ -1,7 +1,7 @@
 import { auth } from './firebase';
+import { getApiBaseUrl } from './apiConfig';
 import type { Report, TrendsResponse } from '../types';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 const API_TIMEOUT_MS = 45_000;
 const API_RETRIES = 2;
 const RETRY_DELAY_MS = 4_000;
@@ -88,7 +88,7 @@ export async function uploadReport(file: File): Promise<Report> {
   const formData = new FormData();
   formData.append('file', file);
 
-  const response = await fetchWithRetry(`${API_BASE}/api/reports/upload`, {
+  const response = await fetchWithRetry(`${getApiBaseUrl()}/api/reports/upload`, {
     method: 'POST',
     headers,
     body: formData,
@@ -99,13 +99,13 @@ export async function uploadReport(file: File): Promise<Report> {
 
 export async function fetchReports(): Promise<Report[]> {
   const headers = await getAuthHeaders();
-  const response = await fetchWithRetry(`${API_BASE}/api/reports`, { headers });
+  const response = await fetchWithRetry(`${getApiBaseUrl()}/api/reports`, { headers });
   return handleResponse<Report[]>(response);
 }
 
 export async function fetchReport(reportId: string): Promise<Report> {
   const headers = await getAuthHeaders();
-  const response = await fetchWithRetry(`${API_BASE}/api/reports/${reportId}`, {
+  const response = await fetchWithRetry(`${getApiBaseUrl()}/api/reports/${reportId}`, {
     headers,
   });
   return handleResponse<Report>(response);
@@ -113,15 +113,11 @@ export async function fetchReport(reportId: string): Promise<Report> {
 
 export async function fetchTrends(): Promise<TrendsResponse> {
   const headers = await getAuthHeaders();
-  const response = await fetchWithRetry(`${API_BASE}/api/trends`, { headers });
+  const response = await fetchWithRetry(`${getApiBaseUrl()}/api/trends`, { headers });
   return handleResponse<TrendsResponse>(response);
 }
 
 export async function checkHealth(): Promise<{ status: string }> {
-  const response = await fetchWithRetry(`${API_BASE}/health`);
+  const response = await fetchWithRetry(`${getApiBaseUrl()}/health`);
   return handleResponse(response);
-}
-
-export function isLikelyLocalApi(): boolean {
-  return !API_BASE || API_BASE.includes('localhost') || API_BASE.includes('127.0.0.1');
 }

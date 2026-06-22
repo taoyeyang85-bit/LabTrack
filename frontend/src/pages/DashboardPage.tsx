@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import ReportList from '../components/ReportList';
 import TrendChart from '../components/TrendChart';
 import { useDashboard } from '../hooks/useReports';
+import { getApiBaseUrl, getApiSetupHint } from '../lib/apiConfig';
 import { TREND_BIOMARKERS } from '../types';
 
 export default function DashboardPage() {
@@ -10,6 +11,7 @@ export default function DashboardPage() {
   const trendCharts = TREND_BIOMARKERS.filter(
     (name) => trends[name] && trends[name].length >= 2
   );
+  const setupHint = getApiSetupHint();
 
   return (
     <div className="dashboard-page container">
@@ -32,6 +34,8 @@ export default function DashboardPage() {
           <div>
             <strong>Could not load your reports</strong>
             <p>{apiError}</p>
+            {setupHint && <p>{setupHint}</p>}
+            <p className="text-muted">API: {getApiBaseUrl()}</p>
           </div>
           <div className="banner-actions">
             <button type="button" className="btn btn-secondary btn-sm" onClick={() => void reload()}>
