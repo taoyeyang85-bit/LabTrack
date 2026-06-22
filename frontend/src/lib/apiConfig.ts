@@ -1,4 +1,4 @@
-const DEFAULT_PRODUCTION_API_BASE_URL = 'https://labtrack-api.onrender.com';
+const DEFAULT_PRODUCTION_API_BASE_URL = 'https://labtrack-production-21c6.up.railway.app';
 
 function normalizeUrl(url: string): string {
   return url.replace(/\/+$/, '');
