@@ -50,4 +50,7 @@ content = upsert("FIREBASE_PRIVATE_KEY", f'"{private_key}"', content)
 env_path.write_text(content)
 print(f"Updated {env_path}")
 print("Delete the downloaded JSON file after import — do not commit it.")
+print()
+print("For Railway, you can instead set one variable:")
+print("  FIREBASE_SERVICE_ACCOUNT_JSON=<paste the full JSON on one line>")
 PY

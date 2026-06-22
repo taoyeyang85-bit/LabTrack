@@ -122,18 +122,30 @@ chmod +x scripts/set-github-secrets.sh
 
 1. Create a project at [Railway](https://railway.app/) → root directory `backend/`
 2. After trial, **stay on Free plan** ($0/mo, ~$1 usage credit/month)
-3. Add variables:
+3. Add variables (recommended: use the single JSON variable):
+
+   | Variable | Value |
+   |----------|-------|
+   | `FIREBASE_SERVICE_ACCOUNT_JSON` | Full service-account JSON on **one line** (easiest on Railway) |
+   | `CORS_ORIGINS` | `https://taoyeyang85-bit.github.io,http://localhost:5173` |
+   | `OPENAI_API_KEY` | *(leave empty)* |
+
+   Or set these separately instead of `FIREBASE_SERVICE_ACCOUNT_JSON`:
 
    | Variable | Value |
    |----------|-------|
    | `FIREBASE_PROJECT_ID` | `labtrack-f1e40` |
    | `FIREBASE_CLIENT_EMAIL` | (from service account) |
-   | `FIREBASE_PRIVATE_KEY` | (from service account, keep `\n` newlines) |
-   | `OPENAI_API_KEY` | *(leave empty)* |
-   | `LLM_MODEL` | `gpt-4o-mini` |
-   | `CORS_ORIGINS` | `https://taoyeyang85-bit.github.io,http://localhost:5173` |
+   | `FIREBASE_PRIVATE_KEY` | Private key with `\\n` escaped newlines, not real line breaks |
 
-4. Copy the public Railway URL
+   Generate the one-line JSON from a downloaded key:
+
+   ```bash
+   ./scripts/import-service-account.sh ~/Downloads/labtrack-f1e40-firebase-adminsdk-xxxxx.json
+   python3 -c 'import json, pathlib; print(json.dumps(json.loads(pathlib.Path("~/Downloads/key.json").expanduser().read_text())))'
+   ```
+
+4. Copy the public Railway URL (for example `https://labtrack-production-21c6.up.railway.app`)
 5. Update the `VITE_API_BASE_URL` GitHub secret to that URL
 6. Re-run the GitHub Pages workflow
 

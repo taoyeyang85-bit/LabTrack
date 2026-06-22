@@ -5,20 +5,24 @@ from typing import Optional
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from app.config import get_settings
+from app.firebase_credentials import load_service_account_info
 
 security = HTTPBearer(auto_error=False)
 
 _firebase_app = None
+_firebase_init_error: str | None = None
 
 
 def _init_firebase():
-    global _firebase_app
+    global _firebase_app, _firebase_init_error
     if _firebase_app is not None:
         return _firebase_app
+    if _firebase_init_error is not None:
+        return None
 
-    settings = get_settings()
-    if not settings.firebase_project_id or not settings.firebase_private_key:
+    service_account = load_service_account_info()
+    if service_account is None:
+        _firebase_init_error = "Firebase service account is not configured."
         return None
 
     import firebase_admin
@@ -28,20 +32,20 @@ def _init_firebase():
         _firebase_app = firebase_admin.get_app()
         return _firebase_app
 
-    cred = credentials.Certificate(
-        {
-            "type": "service_account",
-            "project_id": settings.firebase_project_id,
-            "private_key_id": "labtrack-key",
-            "private_key": settings.firebase_private_key,
-            "client_email": settings.firebase_client_email,
-            "client_id": "labtrack-client",
-            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-            "token_uri": "https://oauth2.googleapis.com/token",
-        }
-    )
-    _firebase_app = firebase_admin.initialize_app(cred)
-    return _firebase_app
+    try:
+        cred = credentials.Certificate(service_account)
+        _firebase_app = firebase_admin.initialize_app(cred)
+        return _firebase_app
+    except Exception as exc:
+        _firebase_init_error = (
+            "Firebase credentials are invalid. On Railway, set FIREBASE_SERVICE_ACCOUNT_JSON "
+            "to the full service-account JSON on one line, or paste FIREBASE_PRIVATE_KEY with "
+            "\\n escaped newlines."
+        )
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=_firebase_init_error,
+        ) from exc
 
 
 async def get_current_uid(
@@ -55,9 +59,10 @@ async def get_current_uid(
 
     app = _init_firebase()
     if app is None:
+        detail = _firebase_init_error or "Authentication service is not configured."
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Authentication service is not configured.",
+            detail=detail,
         )
 
     from firebase_admin import auth
