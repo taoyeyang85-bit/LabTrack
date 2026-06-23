@@ -14,7 +14,7 @@ class Settings:
     firebase_client_email: str = os.getenv("FIREBASE_CLIENT_EMAIL", "")
     firebase_private_key: str = normalize_private_key(os.getenv("FIREBASE_PRIVATE_KEY", ""))
     firebase_service_account_json: str = os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON", "")
-    openai_api_key: str = os.getenv("OPENAI_API_KEY", "")
+    openai_api_key: str = os.getenv("OPENAI_API_KEY", "").strip().strip('"').strip("'")
     llm_model: str = os.getenv("LLM_MODEL", "gpt-4o-mini")
     cors_origins: list[str] = [
         origin.strip()

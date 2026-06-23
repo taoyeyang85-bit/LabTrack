@@ -1,10 +1,13 @@
 import json
+import logging
 import re
 from typing import Optional
 
 from app.config import get_settings
 from app.models import Biomarker, Explanation
 from app.parsing import generate_trend_message
+
+logger = logging.getLogger(__name__)
 
 DEFAULT_DOCTOR_QUESTIONS = [
     "Should I repeat any of these tests?",
@@ -69,6 +72,23 @@ def _fallback_explanations(
     return explanations, DEFAULT_DOCTOR_QUESTIONS.copy(), warnings
 
 
+def _llm_failure_message(exc: Exception) -> str:
+    message = str(exc).lower()
+    if "insufficient_quota" in message or "exceeded your current quota" in message:
+        return (
+            "OpenAI quota exceeded. Add billing at https://platform.openai.com/account/billing "
+            "or remove OPENAI_API_KEY on Railway to use free rule-based explanations."
+        )
+    if "invalid_api_key" in message or "incorrect api key" in message:
+        return "OpenAI API key is invalid. Check OPENAI_API_KEY on Railway."
+    if "model_not_found" in message or "does not exist" in message:
+        return (
+            "OpenAI model is unavailable. Check LLM_MODEL on Railway "
+            "(default: gpt-4o-mini)."
+        )
+    return "LLM explanation was unavailable; rule-based explanations were used instead."
+
+
 def generate_explanations(
     biomarkers: list[Biomarker],
     trend_messages: dict[str, Optional[str]],
@@ -85,10 +105,11 @@ def generate_explanations(
         explanations, questions, warnings = result
         warnings.insert(0, "OpenAI package not installed; rule-based explanations were used instead.")
         return explanations, questions, warnings
-    except Exception:
+    except Exception as exc:
+        logger.exception("LLM explanation failed")
         result = _fallback_explanations(biomarkers, trend_messages, extraction_warnings)
         explanations, questions, warnings = result
-        warnings.insert(0, "LLM explanation was unavailable; rule-based explanations were used instead.")
+        warnings.insert(0, _llm_failure_message(exc))
         return explanations, questions, warnings
 
 
